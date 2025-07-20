@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Estoque</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div id="app">
+    <h1>Controle de Estoque</h1>
+    <ul id="item-list"></ul>
+  </div>
+
+  <script>
+    const itens = [
+      "1. arroz", "2. macarrão espaguete", "3. macarrão pene", "4. trigo", "5. creme de leite",
+      "6. leite condensado", "7. ovos", "8. molho shoyu", "9. ketchup", "10. mostarda",
+      "11. ervilha", "12. farinha", "13. Óleo", "14. margarina", "15. gordura",
+      "16. vagetal", "17. feijão mulato", "18. feijão preto", "19. feijão macassa", "20. feijão branco",
+      "21. leite em pó", "22. café", "23. calabresa", "24. bacon", "25. extrato de tomate",
+      "26. batata frita", "27. camarão", "28. macaxeira", "29. massa p/ pastel", "30. queijo ralado",
+      "31. milho em conserva", "32. orégano", "33. caldo de galinha", "34. sal", "35. buxo",
+      "36. tripa sarapatel", "37. peixe", "38. mão de vaca", "39. sabão em pedra",
+      "40. sabão em pó", "41. detergente", "42. água sanitária", "43. papel toalha"
+    ];
+
+    const listElement = document.getElementById('item-list');
+
+    function salvarDados(dados) {
+      localStorage.setItem('estoque', JSON.stringify(dados));
+    }
+
+    function carregarDados() {
+      const salvo = localStorage.getItem('estoque');
+      return salvo ? JSON.parse(salvo) : {};
+    }
+
+    const estoque = carregarDados();
+
+    itens.forEach(nome => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <strong>${nome}</strong> - Qtd:
+        <button onclick="alterarQuantidade('${nome}', -1)">-</button>
+        <span id="qtd-${nome}">${estoque[nome] || 0}</span>
+        <button onclick="alterarQuantidade('${nome}', 1)">+</button>
+      `;
+      li.className = 'item';
+      listElement.appendChild(li);
+    });
+
+    function alterarQuantidade(nome, delta) {
+      estoque[nome] = (estoque[nome] || 0) + delta;
+      if (estoque[nome] < 0) estoque[nome] = 0;
+      document.getElementById(`qtd-${nome}`).innerText = estoque[nome];
+      salvarDados(estoque);
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>
